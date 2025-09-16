@@ -1,0 +1,14 @@
+:root { --max: 960px; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; line-height: 1.5; }
+.container { max-width: var(--max); margin: 0 auto; padding: 1rem; }
+header { display: flex; gap: 1rem; align-items: center; justify-content: space-between; border-bottom: 1px solid #ddd; }
+nav a { margin-right: .75rem; text-decoration: none; }
+main { padding-block: 1rem 2rem; }
+.cards { list-style: none; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.card { border: 1px solid #eee; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,.04); }
+button { cursor: pointer; padding: .6rem 1rem; border-radius: 10px; border: 1px solid #ddd; background: #fff; }
+form { display: grid; gap: .75rem; max-width: 520px; }
+label { display: grid; gap: .35rem; }
+input, textarea { padding: .6rem .7rem; border-radius: 10px; border: 1px solid #ccc; }
+footer { border-top: 1px solid #eee; text-align: center; padding: 1rem; color: #555; }
