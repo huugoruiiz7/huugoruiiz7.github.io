@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comparador de Suscripciones</title>
+  <meta name="description" content="Calculadora y comparador de suscripciones digitales (MVP)">
+  <style>
+    :root{
+      --max: 1000px; --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji","Segoe UI Emoji";line-height:1.4;background:#0b1020;color:#eef2ff}
+    a{color:inherit}
+    .container{max-width:var(--max);margin:0 auto;padding:1rem}
+    header{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid #1f2a44}
+    header h1{font-size:1.4rem;margin:0}
+    .pill{background:#121a35;border:1px solid #1f2a44;padding:.4rem .7rem;border-radius:999px}
+    .grid{display:grid;gap:1rem}
+    @media (min-width:900px){.grid-cols-2{grid-template-columns:2fr 1fr}}
+    .card{background:#0f1630;border:1px solid #1f2a44;border-radius:var(--radius);padding:1rem;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+    .services{display:grid;gap:.75rem}
+    .service{display:grid;grid-template-columns:1.2fr 1.5fr 1fr .8fr auto;gap:.5rem;align-items:center;background:#0b132b;border:1px solid #1f2a44;border-radius:12px;padding:.6rem}
+    .service h3{margin:0;font-size:1rem}
+    select, input[type="number"], input[type="checkbox"]{width:100%;padding:.5rem .6rem;border-radius:10px;border:1px solid #2a3a64;background:#0f1630;color:#e6ecff}
+    label{font-size:.8rem;opacity:.85}
+    .totals{display:grid;gap:.6rem}
+    .totals .row{display:flex;justify-content:space-between;align-items:center}
+    .muted{opacity:.7}
+    .hint{font-size:.85rem;opacity:.8;margin:.5rem 0}
+    .btn{cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:12px;border:1px solid #2a3a64;background:#111a38;color:#e6ecff}
+    .btn:hover{background:#14204a}
+    .danger{border-color:#6b1d1d;background:#2a0f13}
+    .success{border-color:#1d6b41;background:#0f2a1e}
+    .flex{display:flex;gap:.6rem;align-items:center}
+    .right{text-align:right}
+    footer{padding:2rem 1rem;border-top:1px solid #1f2a44;text-align:center;opacity:.8}
+    .tag{font-size:.7rem;background:#121a35;border:1px solid #1f2a44;border-radius:999px;padding:.15rem .5rem}
+  </style>
+</head>
+<body>
+  <header class="container">
+    <h1>🧮 Comparador de suscripciones</h1>
+    <div class="flex">
+      <span class="pill">MVP local (sin backend)</span>
+    </div>
+  </header>
+
+  <main class="container grid grid-cols-2">
+    <section class="card">
+      <div class="flex" style="justify-content:space-between;align-items:center;margin-bottom:.5rem">
+        <h2 style="margin:0;font-size:1.1rem">📦 Servicios</h2>
+        <div class="flex">
+          <label class="flex" style="gap:.4rem"><input id="toggleAnnual" type="checkbox"> <span>Mostrar precios anuales (si hay)</span></label>
+        </div>
+      </div>
+
+      <p class="hint">Marca <strong>Incluir</strong>, elige un <strong>plan</strong> y cuántas personas lo comparten. Los precios son <em>ejemplo</em>; actualízalos en <code>catalogue</code> si quieres usarlos reales.</p>
+
+      <div id="services" class="services"></div>
+
+      <div class="flex" style="justify-content:space-between;margin-top:.75rem">
+        <button class="btn" id="resetBtn">Reiniciar selección</button>
+        <div class="flex">
+          <button class="btn" id="saveBtn">Guardar selección</button>
+          <button class="btn" id="loadBtn">Cargar</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2 style="margin-top:0;font-size:1.1rem">💶 Totales</h2>
+      <div class="totals">
+        <div class="row"><span>Total mensual (bruto)</span><strong id="totalMonthly">0,00 €</strong></div>
+        <div class="row muted"><span>Total anual estimado</span><span id="totalYearly">0,00 €</span></div>
+        <div class="row"><span>Tu coste por persona / mes</span><strong id="perPerson">0,00 €</strong></div>
+      </div>
+
+      <h3 style="margin-top:1.2rem">🧠 Consejos</h3>
+      <ul style="margin-top:.3rem; padding-left:1.1rem; line-height:1.5">
+        <li>Si compartes 3+ servicios, valora planes <em>Family/Duo</em>.</li>
+        <li>Revisa si hay <em>packs</em> (p. ej. móvil + TV + plataformas) que te salgan mejor.</li>
+        <li>Desactiva renovaciones que no usas cada mes (rotación de plataformas).</li>
+      </ul>
+
+      <div class="hint">💡 Este MVP guarda tus selecciones en <code>localStorage</code>. No se envía nada fuera.</div>
+
+      <div class="card" style="margin-top:1rem;background:#0b132b">
+        <div class="flex" style="justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:600">¿Precios desactualizados?</div>
+            <div class="muted">Edita el catálogo en el código (objeto <code>catalogue</code>).</div>
+          </div>
+          <span class="tag">DIY</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Hecho con ❤️ en HTML/CSS/JS. – Actualiza precios según tu país/plan.
+  </footer>
+
+  <script>
+    // --- Catálogo de ejemplo (actualiza a tu gusto). Precios NO oficiales ---
+    // Estructura: cada servicio tiene planes con precio mensual, opcional anual y máximo de usuarios
+    const catalogue = [
+      {
+        id: 'netflix', name: 'Netflix',
+        plans: [
+          { id: 'basic', label: 'Básico', monthly: 7.99, yearly: null, maxUsers: 1 },
+          { id: 'standard', label: 'Estándar', monthly: 12.99, yearly: null, maxUsers: 2 },
+          { id: 'premium', label: 'Premium', monthly: 17.99, yearly: null, maxUsers: 4 },
+        ]
+      },
+      {
+        id: 'spotify', name: 'Spotify',
+        plans: [
+          { id: 'individual', label: 'Individual', monthly: 10.99, yearly: null, maxUsers: 1 },
+          { id: 'duo', label: 'Duo', monthly: 14.99, yearly: null, maxUsers: 2 },
+          { id: 'family', label: 'Familiar (hasta 6)', monthly: 17.99, yearly: null, maxUsers: 6 },
+          { id: 'student', label: 'Estudiante', monthly: 5.99, yearly: null, maxUsers: 1 },
+        ]
+      },
+      {
+        id: 'prime', name: 'Amazon Prime',
+        plans: [
+          { id: 'prime', label: 'Prime', monthly: 4.99, yearly: 49.90, maxUsers: 2 },
+        ]
+      },
+      {
+        id: 'max', name: 'Max (HBO)',
+        plans: [
+          { id: 'standard', label: 'Estándar con anuncios', monthly: 5.99, yearly: null, maxUsers: 2 },
+          { id: 'adfree', label: 'Sin anuncios', monthly: 9.99, yearly: null, maxUsers: 2 },
+          { id: 'ultimate', label: 'Ultimate', monthly: 13.99, yearly: null, maxUsers: 4 },
+        ]
+      },
+      {
+        id: 'youtube', name: 'YouTube Premium',
+        plans: [
+          { id: 'individual', label: 'Individual', monthly: 11.99, yearly: null, maxUsers: 1 },
+          { id: 'family', label: 'Familiar (hasta 5)', monthly: 17.99, yearly: null, maxUsers: 5 },
+          { id: 'student', label: 'Estudiante', monthly: 6.99, yearly: null, maxUsers: 1 },
+        ]
+      },
+      {
+        id: 'apple', name: 'Apple TV+',
+        plans: [
+          { id: 'standard', label: 'Estándar', monthly: 9.99, yearly: null, maxUsers: 6 },
+        ]
+      },
+      {
+        id: 'icloud', name: 'iCloud+',
+        plans: [
+          { id: '50gb', label: '50 GB', monthly: 0.99, yearly: null, maxUsers: 5 },
+          { id: '200gb', label: '200 GB', monthly: 2.99, yearly: null, maxUsers: 5 },
+          { id: '2tb', label: '2 TB', monthly: 9.99, yearly: null, maxUsers: 5 },
+        ]
+      },
+      {
+        id: 'googleone', name: 'Google One',
+        plans: [
+          { id: '100gb', label: '100 GB', monthly: 1.99, yearly: 19.99, maxUsers: 5 },
+          { id: '200gb', label: '200 GB', monthly: 2.99, yearly: 29.99, maxUsers: 5 },
+          { id: '2tb', label: '2 TB', monthly: 9.99, yearly: 99.99, maxUsers: 5 },
+        ]
+      },
+      {
+        id: 'microsoft365', name: 'Microsoft 365',
+        plans: [
+          { id: 'personal', label: 'Personal', monthly: 7.00, yearly: 69.00, maxUsers: 1 },
+          { id: 'family', label: 'Familia (hasta 6)', monthly: 10.00, yearly: 99.00, maxUsers: 6 },
+        ]
+      },
+      {
+        id: 'disney', name: 'Disney+',
+        plans: [
+          { id: 'standard', label: 'Estándar', monthly: 8.99, yearly: null, maxUsers: 2 },
+          { id: 'premium', label: 'Premium', monthly: 11.99, yearly: null, maxUsers: 4 },
+        ]
+      },
+    ];
+
+    // Estado de selección
+    const state = {
+      items: {}, // idServicio -> { include, planId, sharers }
+      showAnnual: false,
+    };
+
+    const servicesEl = document.getElementById('services');
+    const totalMonthlyEl = document.getElementById('totalMonthly');
+    const totalYearlyEl = document.getElementById('totalYearly');
+    const perPersonEl = document.getElementById('perPerson');
+
+    const euro = n => (n ?? 0).toLocaleString('es-ES', { style:'currency', currency:'EUR' });
+
+    function render(){
+      servicesEl.innerHTML = '';
+      catalogue.forEach(svc => {
+        const sel = state.items[svc.id] || { include:false, planId: svc.plans[0].id, sharers: 1 };
+        const plan = svc.plans.find(p=>p.id===sel.planId) || svc.plans[0];
+
+        const wrap = document.createElement('div');
+        wrap.className = 'service';
+        wrap.innerHTML = `
+          <div>
+            <h3>${svc.name}</h3>
+            <label class="muted">Incluir <input type="checkbox" ${sel.include? 'checked':''} data-k="include"></label>
+          </div>
+          <div>
+            <label>Plan</label>
+            <select data-k="planId">
+              ${svc.plans.map(p => `<option value="${p.id}" ${p.id===sel.planId?'selected':''}>${p.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label>Usuarios que comparten (máx ${plan.maxUsers ?? 1})</label>
+            <input type="number" min="1" max="${plan.maxUsers ?? 1}" step="1" value="${Math.min(sel.sharers||1, plan.maxUsers||1)}" data-k="sharers" />
+          </div>
+          <div class="right">
+            <label>Precio ${state.showAnnual && plan.yearly? 'anual' : 'mensual'}</label>
+            <div><strong>${state.showAnnual && plan.yearly? euro(plan.yearly): euro(plan.monthly)}</strong></div>
+            <div class="muted" style="font-size:.8rem">≈ por persona: <span class="per-person">${calcPerPerson(svc.id, sel, state.showAnnual)}</span></div>
+          </div>
+          <div class="right">
+            <button class="btn" data-k="remove">Quitar</button>
+          </div>
+        `;
+
+        wrap.querySelector('[data-k="include"]').addEventListener('change', (e)=>{
+          updateSvc(svc.id, { include: e.target.checked });
+        });
+        wrap.querySelector('[data-k="planId"]').addEventListener('change', (e)=>{
+          updateSvc(svc.id, { planId: e.target.value });
+        });
+        wrap.querySelector('[data-k="sharers"]').addEventListener('input', (e)=>{
+          const max = (svc.plans.find(p=>p.id=== (state.items[svc.id]?.planId || svc.plans[0].id))||{}).maxUsers || 1;
+          const v = Math.max(1, Math.min(parseInt(e.target.value||'1',10), max));
+          e.target.value = v;
+          updateSvc(svc.id, { sharers: v });
+        });
+        wrap.querySelector('[data-k="remove"]').addEventListener('click', ()=>{
+          updateSvc(svc.id, { include:false });
+        });
+
+        servicesEl.appendChild(wrap);
+      });
+
+      computeTotals();
+    }
+
+    function updateSvc(id, patch){
+      const cur = state.items[id] || { include:false, planId: catalogue.find(s=>s.id===id)?.plans[0]?.id, sharers:1 };
+      state.items[id] = { ...cur, ...patch };
+      // Si cambia el plan, valida sharers máximo
+      const plan = (catalogue.find(s=>s.id===id)?.plans||[]).find(p=>p.id===state.items[id].planId);
+      if(plan){
+        state.items[id].sharers = Math.min(state.items[id].sharers||1, plan.maxUsers||1);
+      }
+      saveToHash();
+      render();
+    }
+
+    function calcPerPerson(svcId, sel, annual){
+      const svc = catalogue.find(s=>s.id===svcId);
+      const plan = svc?.plans.find(p=>p.id===sel.planId);
+      if(!plan) return euro(0);
+      const base = annual && plan.yearly ? (plan.yearly/12) : plan.monthly;
+      const per = (base || 0) / Math.max(1, sel.sharers||1);
+      return euro(per);
+    }
+
+    function computeTotals(){
+      let monthly = 0;
+      let yearly = 0;
+      let perPersonMonthly = 0;
+
+      Object.entries(state.items).forEach(([id, sel])=>{
+        if(!sel.include) return;
+        const svc = catalogue.find(s=>s.id===id);
+        const plan = svc?.plans.find(p=>p.id===sel.planId);
+        if(!plan) return;
+        const m = plan.monthly || 0;
+        const y = plan.yearly || (plan.monthly? plan.monthly*12 : 0);
+        monthly += m;
+        yearly += y;
+        perPersonMonthly += (m / Math.max(1, sel.sharers||1));
+      });
+
+      totalMonthlyEl.textContent = euro(monthly);
+      totalYearlyEl.textContent = euro(yearly);
+      perPersonEl.textContent = euro(perPersonMonthly);
+    }
+
+    // Persistencia sencilla
+    const saveBtn = document.getElementById('saveBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const toggleAnnual = document.getElementById('toggleAnnual');
+
+    saveBtn.addEventListener('click', ()=>{
+      localStorage.setItem('subs-state', JSON.stringify(state));
+      alert('Selección guardada en tu navegador.');
+    });
+    loadBtn.addEventListener('click', ()=>{
+      const raw = localStorage.getItem('subs-state');
+      if(!raw) return alert('No hay nada guardado.');
+      try{ Object.assign(state, JSON.parse(raw)); render(); }
+      catch{ alert('No se pudo cargar.'); }
+    });
+    resetBtn.addEventListener('click', ()=>{
+      state.items = {}; render();
+    });
+    toggleAnnual.addEventListener('change', (e)=>{
+      state.showAnnual = e.target.checked; render();
+    });
+
+    // Compartir por URL (hash)
+    function saveToHash(){
+      const compact = { showAnnual: state.showAnnual, items: {} };
+      Object.entries(state.items).forEach(([k,v])=>{
+        compact.items[k] = { i: v.include?1:0, p: v.planId, s: v.sharers };
+      });
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(compact))));
+      location.hash = encoded;
+    }
+    function loadFromHash(){
+      if(!location.hash) return;
+      try{
+        const json = decodeURIComponent(escape(atob(location.hash.slice(1))));
+        const obj = JSON.parse(json);
+        state.showAnnual = !!obj.showAnnual;
+        toggleAnnual.checked = state.showAnnual;
+        state.items = {};
+        Object.entries(obj.items||{}).forEach(([k,v])=>{
+          state.items[k] = { include: !!v.i, planId: v.p, sharers: v.s };
+        });
+      }catch{}
+    }
+
+    // Inicializa
+    loadFromHash();
+    render();
+  </script>
+</body>
+</html>
